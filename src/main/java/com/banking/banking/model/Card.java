@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,25 +16,22 @@ import java.util.List;
 @Setter
 public class Card {
      @Id
-     @GeneratedValue(strategy = GenerationType.UUID)
-    private String cardId;
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String cardHolder;
-    @Column(nullable = false, unique = true)
-    private long cardNumber;
-    private String balance;
-    @CreationTimestamp
-    private  LocalDate  issAt;
-    @UpdateTimestamp
-    private LocalDateTime expAt;
+    private String cardNumber;
+    private String  amount;
     private String cvv;
     private String pin;
+    @Enumerated(EnumType.STRING)
+    private CardType cardType;
+    @CreationTimestamp// Example: "Debit", "Credit"
+    private String expirationDate;
     private String billingAddress;
-      @OneToOne
-      @JoinColumn(name = "owner_id")
+    @ManyToOne
+   @JoinColumn(name = "owner_id", nullable = false)
     private AppUser owner;
 
-      @OneToMany(mappedBy = "card" ,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Transaction> transaction;
 
 }

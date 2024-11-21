@@ -9,11 +9,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -22,41 +25,56 @@ import java.util.stream.Collectors;
 @Builder
 @Getter
 @Setter
-public class AppUser  implements UserDetails {
+public class AppUser implements  UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private  String uid;
+    private  Long id;
     private String firstname;
     private String lastname;
     private  String username;
-    private String email;
     private String gender;
-    private Date dob;
-    private  long phoneNumber;
-    private String tag;
+    private  String email;
+    private String dob;
+    private  String phoneNumber;
+    private BigDecimal accountBalance;
+    private String accountNumber;
     private String password;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    private List<String > roles;
-
-
-    @OneToOne(cascade = CascadeType.ALL,mappedBy = "owner")
-    private  Card card;
-
-    @OneToMany(mappedBy = "owner" ,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Transaction> transaction;
-
-    @OneToMany(mappedBy = "owner" ,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Account> account;
+    @Enumerated(EnumType.STRING)
+    private Role roles;
+ @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Card> card;
+ @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+ private List<Transaction> transaction;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return List.of(new SimpleGrantedAuthority(roles.name()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
